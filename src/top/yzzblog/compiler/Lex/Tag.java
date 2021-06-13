@@ -1,4 +1,4 @@
-package top.yzzblog.compiler;
+package top.yzzblog.compiler.Lex;
 
 public enum Tag {
     ERR,    // 错误

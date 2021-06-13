@@ -1,4 +1,4 @@
-package top.yzzblog.compiler;
+package top.yzzblog.compiler.Lex;
 
 public class Token {
     public final Tag tag;
@@ -17,8 +17,8 @@ public class Token {
     static class ID extends Token {
         public final String name;
 
-        public ID(Tag tag, String name) {
-            super(tag);
+        public ID(String name) {
+            super(Tag.ID);
             this.name = name;
         }
 
@@ -34,8 +34,8 @@ public class Token {
     static class Num extends Token {
         public final Integer val;
 
-        public Num(Tag tag, Integer val) {
-            super(tag);
+        public Num(Integer val) {
+            super(Tag.NUM);
             this.val = val;
         }
 

@@ -1,9 +1,6 @@
-package top.yzzblog.compiler;
+package top.yzzblog.compiler.Lex;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class Scanner {
     private BufferedReader br;
@@ -13,12 +10,20 @@ public class Scanner {
 
     private int lastChar;
 
+    private File file;
+
     public Scanner(String filename) {
+        file = new File(filename);
+
         try {
-            br = new BufferedReader(new FileReader(filename));
+            br = new BufferedReader(new FileReader(file));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public Scanner(InputStream is) {
+        br = new BufferedReader(new InputStreamReader(is));
     }
 
     public char scan() {
@@ -28,7 +33,6 @@ public class Scanner {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         if (lastChar == '\n') {
             lineNum++;
             colNum = 0;
@@ -37,7 +41,7 @@ public class Scanner {
         if (ch == -1) {
             close();
             return '$';
-        } else if(ch != '\n') colNum++;
+        } else if (ch != '\n') colNum++;
 
         lastChar = ch;
 
@@ -57,6 +61,10 @@ public class Scanner {
     }
 
     public int getColNum() {
-        return  colNum;
+        return colNum;
+    }
+
+    public String getFile() {
+        return file.getAbsolutePath();
     }
 }
