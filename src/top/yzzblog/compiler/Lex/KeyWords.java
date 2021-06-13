@@ -7,6 +7,8 @@ public class KeyWords {
 
     static {
         keywords.put("int", Tag.KW_INT);
+        keywords.put("const", Tag.KW_CONST);
+        keywords.put("void", Tag.KW_VOID);
         keywords.put("if", Tag.KW_IF);
         keywords.put("else", Tag.KW_ELSE);
         keywords.put("while", Tag.KW_WHILE);

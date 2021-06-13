@@ -4,7 +4,7 @@ public enum Tag {
     ERR,    // 错误
     END,    // 文件结束
     ID,     // 标识符
-    KW_INT, // 数据类型
+    KW_INT, KW_VOID, KW_CONST, // 数据类型
     NUM,    // 常量
     NOT,    // 单目运算符 !
     ADD, SUB, MUL, DIV, MOD, // 算术运算符

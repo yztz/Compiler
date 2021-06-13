@@ -4,7 +4,7 @@ import top.yzzblog.compiler.Util;
 
 import java.io.InputStream;
 
-public class Lexer {
+public class Lexer implements Tokenizer {
     private final Scanner scanner;
     private char ch;
 
@@ -21,9 +21,7 @@ public class Lexer {
     public void parse() {
         Token token = getToken();
         while (token.tag != Tag.END) {
-            if (token.tag != Tag.ERR) {
-                System.out.println(token);
-            }
+            System.out.println(token);
             token = getToken();
         }
 
@@ -251,7 +249,17 @@ public class Lexer {
                     token = new Token(Tag.ERR);
             }
 
-
+        if (token.tag == Tag.ERR) token = getToken();
         return token;
+    }
+
+    @Override
+    public int getLineNo() {
+        return scanner.getLineNum();
+    }
+
+    @Override
+    public int getColNo() {
+        return scanner.getColNum();
     }
 }

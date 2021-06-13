@@ -1,3 +1,5 @@
+package top.yzzblog.compiler.test;
+
 import org.junit.Test;
 import top.yzzblog.compiler.Lex.Lexer;
 
