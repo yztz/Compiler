@@ -1,29 +1,25 @@
 package top.yzzblog.compiler.grammar;
 
-import top.yzzblog.compiler.Util;
-
 import java.util.*;
-import java.util.function.Predicate;
 
 public class GrammarUtil {
+    /**
+     * 左递归消除
+     *
+     * @param grammar
+     * @return
+     */
     public static Grammar rmLRecursion(Grammar grammar) {
         Grammar ret = Grammar.extend(grammar);
 
-        for (int i = 0; i < grammar.V.size(); i++) {
-            String Ai = grammar.V.get(i);
-            List<Rule> ris = new ArrayList<>(); //用于存储Ai相关规则的临时表
-
-            for (Rule rule : grammar.rules) {   // 找到以Ai为左部的规则
-                if (rule.L.equals(Ai)) ris.add(rule);
-            }
+        for (int i = 0; i < grammar.getV().size(); i++) {
+            String Ai = grammar.getV().get(i);
+            List<Rule> ris = grammar.getRulesOf(Ai);; //找到所有以Ai为左部的规则
 
             for (int j = 0; j < i; j++) {
-                String Aj = grammar.V.get(j);
+                String Aj = grammar.getV().get(j);
                 // 1.找到所有以Aj为左部的规则
-                List<Rule> rjs = new ArrayList<>();
-                for (Rule rule : ret.rules) {
-                    if (rule.L.equals(Aj)) rjs.add(rule);
-                }
+                List<Rule> rjs = grammar.getRulesOf(Aj);
 
                 // 2.找到所有形如Ai -> Ajγ的规则
                 List<Rule> tmp = new ArrayList<>(ris);
@@ -47,12 +43,12 @@ public class GrammarUtil {
                 Rule rule = ris.get(idx);
                 if (L.equals(rule.R[0])) indices.add(idx);
             }
-            if (indices.isEmpty())  // 当不存在直接左递归
+            if (indices.isEmpty()) {  // 当不存在直接左递归
                 ret.addRules(ris);
-            else {
+            } else {
                 List<Rule> rules = new ArrayList<>();   // 新建规则表
                 String L_ = L + "$";
-                ret.V.add(L_);  // 将新添的符号加入到 V
+                ret.getV().add(L_);  // 将新添的符号加入到 V
                 for (int idx = 0; idx < ris.size(); idx++) {
                     Rule rule = ris.get(idx);
                     if (indices.contains(idx)) {    // 如果当前索引规则存在左递归
@@ -74,20 +70,82 @@ public class GrammarUtil {
         return ret;
     }
 
-
+    /**
+     * 无关项消除
+     *
+     * @param grammar
+     */
     public static void delInvalidRule(Grammar grammar) {
         Set<String> reachable = new HashSet<>();
-        reachable.add(grammar.S);
+        reachable.add(grammar.getS());
         int i = 0;
-        while (i != grammar.rules.size()) {
-            Rule rule = grammar.rules.get(i);
+        while (i != grammar.getRuleNum()) { // 当集合不再变更
+            Rule rule = grammar.getRule(i);
+            // 可达集合包含 且 集合新增
             if (reachable.contains(rule.L) && reachable.addAll(Arrays.asList(rule.R))) {
                 i = 0;
             } else {
                 i++;
             }
         }
-        grammar.V.retainAll(reachable);
-        grammar.rules.removeIf(rule -> !grammar.V.contains(rule.L));
+        grammar.getV().retainAll(reachable); // 去除不相关的非终结符号
+        grammar.removeRuleIf(rule -> !grammar.getV().contains(rule.L)); // 去除对应规则
     }
+
+    /**
+     * 左公共因子提取（目前只支持单因子的提取，长前缀|隐含公共因子等不支持）
+     * @param grammar
+     * @return
+     */
+    public static Grammar extractCommonFactor(Grammar grammar) {
+        List<String> V = grammar.getV();
+        Grammar ret = Grammar.extend(grammar);
+
+        for (String v : V) {
+            // 1. 提取以v为左部的规则
+            List<Rule> rules = grammar.getRulesOf(v);
+
+
+            // 2.搜索规则是否存在左公共因子
+            HashMap<String, List<Rule>> map = new HashMap<>();
+            for (Rule rule : rules) {   //将相同因子开头的规则按照开头划分
+                String head = rule.R[0];
+                List<Rule> l = map.getOrDefault(head, null);
+                if (null == map.getOrDefault(head, null)) {
+                    l = new ArrayList<>();
+                    map.put(head, l);
+                }
+                l.add(rule);
+            }
+            int max = 0;
+            String commonHead = null;
+            for (String key : map.keySet()) {   //寻找最多规则的公共头
+                if (map.get(key).size() > max) {
+                    max = map.get(key).size();
+                    commonHead = key;
+                }
+            }
+
+            if (max == 1) {
+                ret.addRules(rules);  //最大规则集长度为1 直接加入
+            } else {
+                List<Rule> extRules = map.get(commonHead);
+                rules.removeAll(extRules);
+                String v_ = v + '$';
+                ret.getV().add(v_);
+                ret.addRules(rules);
+                ret.addRule(new Rule(v + "::" + commonHead + v_));
+                for (Rule rule : extRules) {
+                    ret.addRule(new Rule(v_ + "::" + rule.shiftRHead()));
+                }
+            }
+
+
+        }
+
+
+        return ret;
+    }
+
+
 }

@@ -18,7 +18,7 @@ public class Rule {
         L = lr[0];
         if (lr.length > 1) {
             this.R_str = lr[1];
-            String pattern = ".\\$?";
+            String pattern = ".\\$*";
             Pattern r = Pattern.compile(pattern);
             Matcher m = r.matcher(lr[1]);
             List<String> R = new ArrayList<>();
@@ -47,7 +47,9 @@ public class Rule {
         this.R_str = Util.arrayToString(R);
     }
 
-
+    public boolean isEpsilon() {
+        return R.length == 1 && R[0].equals("ε");
+    }
 
 
     @Override

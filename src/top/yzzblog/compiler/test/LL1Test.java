@@ -36,4 +36,14 @@ public class LL1Test {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void extractCommonTest() {
+        try {
+            Grammar grammar = Grammar.parse("./commonFactor.json");
+            System.out.println(GrammarUtil.extractCommonFactor(grammar));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
