@@ -25,4 +25,12 @@ public class Util {
     public static boolean isWhite(char c) {
         return c == ' ' || c == '\t' || c == '\n' || c == '\r';
     }
+
+    public static String arrayToString(String []array) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : array) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
 }
