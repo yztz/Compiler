@@ -12,8 +12,8 @@ public class Grammar {
     private final List<Rule> rules;
     private final String S;
 
-    private HashMap<String, Set<String>> first = new HashMap<>();
-    private HashMap<String, Set<String>> follow = new HashMap<>();
+    private HashMap<String, Set<String>> first;
+    private HashMap<String, Set<String>> follow;
 
     private Grammar(List<String> V, List<String> T, List<String> P, String S) {
         this.V = new ArrayList<>(V);
@@ -25,6 +25,7 @@ public class Grammar {
             this.rules.add(new Rule(rule));
         }
     }
+
 
     private Grammar(Grammar grammar, List<Rule> rules) {
         this.V = new ArrayList<>(grammar.V);
@@ -87,6 +88,21 @@ public class Grammar {
 //        this.firstCache.clear();
     }
 
+    public Set<String> select(Rule rule) {
+        if (this.first == null || this.follow == null) return null;
+
+        String L = rule.L;
+        String[] R = rule.R;
+        Set<String> ret = first(R);
+
+        if (ret.contains("ε")) {    // 包含 ε
+            ret.remove("ε");
+            ret.addAll(follow(L));
+        }
+
+        return ret;
+    }
+
     public List<Rule> getRules() {
         return rules;
     }
@@ -108,6 +124,8 @@ public class Grammar {
     }
 
     public void compile() {
+        this.first = new HashMap<>();
+        this.follow = new HashMap<>();
         genFirst();
         genFollow();
     }
@@ -115,6 +133,7 @@ public class Grammar {
     private void genFirst() {
         for (String v : V) first.put(v, new HashSet<>());
         for (String t : T) first.put(t, Collections.singleton(t));
+        first.put("ε", Collections.singleton("ε"));
         while (true) {
             boolean flag = false;
             for (Rule rule : rules) {
@@ -142,7 +161,7 @@ public class Grammar {
 
     private void genFollow() {
         for (String v : V) follow.put(v, new HashSet<>());
-        follow.get(S).add("#");
+        follow(S).add("#");
         while (true) {
             boolean flag = false;
             for (Rule rule : rules) {
@@ -175,7 +194,9 @@ public class Grammar {
         boolean epsilonExist = true;
         int idx = 0;
         int len = X.length;
+//        System.out.println(Arrays.toString(X));
         while (idx < len && epsilonExist) {
+//            System.out.println(X[idx]);
             Set<String> Xi = first(X[idx]);
             Set<String> tmp = new HashSet<>(Xi);
             epsilonExist = tmp.remove("ε");
