@@ -1,6 +1,8 @@
 package top.yzzblog.compiler.test;
 
+import org.junit.Before;
 import org.junit.Test;
+import top.yzzblog.compiler.LL1.LL1Parser;
 import top.yzzblog.compiler.grammar.Grammar;
 import top.yzzblog.compiler.grammar.GrammarUtil;
 import top.yzzblog.compiler.grammar.Rule;
@@ -9,6 +11,17 @@ import top.yzzblog.compiler.grammar.Rule;
 import java.io.IOException;
 
 public class LL1Test {
+    private Grammar grammar;
+
+    @Before
+    public void init() {
+        try {
+            this.grammar = Grammar.parse("test1.json");
+            this.grammar = GrammarUtil.rmLRecursion(grammar);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void readTest() {
@@ -45,5 +58,11 @@ public class LL1Test {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void tableTest() {
+        LL1Parser parser = new LL1Parser(grammar, null);
+        System.out.println(parser);
     }
 }
