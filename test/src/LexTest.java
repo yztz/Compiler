@@ -1,8 +1,7 @@
-package top.yzzblog.compiler.test;
+
 
 import org.junit.Test;
 import top.yzzblog.compiler.Lex.Lexer;
-import top.yzzblog.compiler.grammar.Rule;
 
 public class LexTest {
     public static void main(String[] args) {
@@ -22,10 +21,6 @@ public class LexTest {
         Lexer lexer = new Lexer("./comment.sy");
         lexer.parse();
     }
-
-
-
-
 
 
 }

@@ -1,8 +1,13 @@
 package top.yzzblog.compiler.grammar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public class GrammarUtil {
+    private static final Logger logger = LoggerFactory.getLogger(GrammarUtil.class);
+
     /**
      * 左递归消除
      *
@@ -65,32 +70,11 @@ public class GrammarUtil {
         }
 
         // 5.消除无关项
-        delInvalidRule(ret);
+        ret.delInvalidRule();
 
         return ret;
     }
 
-    /**
-     * 无关项消除
-     *
-     * @param grammar
-     */
-    public static void delInvalidRule(Grammar grammar) {
-        Set<String> reachable = new HashSet<>();
-        reachable.add(grammar.getS());
-        int i = 0;
-        while (i != grammar.getRuleNum()) { // 当集合不再变更
-            Rule rule = grammar.getRule(i);
-            // 可达集合包含 且 集合新增
-            if (reachable.contains(rule.L) && reachable.addAll(Arrays.asList(rule.R))) {
-                i = 0;
-            } else {
-                i++;
-            }
-        }
-        grammar.getV().retainAll(reachable); // 去除不相关的非终结符号
-        grammar.removeRuleIf(rule -> !grammar.getV().contains(rule.L)); // 去除对应规则
-    }
 
     /**
      * 左公共因子提取（目前只支持单因子的提取，长前缀|隐含公共因子等不支持）
@@ -104,7 +88,6 @@ public class GrammarUtil {
         for (String v : V) {
             // 1. 提取以v为左部的规则
             List<Rule> rules = grammar.getRulesOf(v);
-
 
             // 2.搜索规则是否存在左公共因子
             HashMap<String, List<Rule>> map = new HashMap<>();
@@ -130,6 +113,7 @@ public class GrammarUtil {
                 ret.addRules(rules);  //最大规则集长度为1 直接加入
             } else {
                 List<Rule> extRules = map.get(commonHead);
+//                System.out.println("提取: " + extRules);
                 rules.removeAll(extRules);
                 String v_ = v + '$';
                 ret.getV().add(v_);
@@ -147,5 +131,77 @@ public class GrammarUtil {
         return ret;
     }
 
+    public static boolean isLL1(Grammar grammar) {
+        // 左递归、公共因子现象
+        if (isCommonFactorExist(grammar)) {
+            logger.debug("非LL1：存在左公共因子");
+            return false;
+        }
+
+        if (isLRecursionExist(grammar)) {
+            logger.debug("非LL1：存在左递归");
+            return false;
+        }
+
+        grammar.compile();
+        for (String v : grammar.getV()) {   // 遍历所有非终结符号下的规则
+            List<Set<String>> sets = new ArrayList<>();
+            for (Rule rule : grammar.getRulesOf(v)) {
+                sets.add(grammar.select(rule));
+            }
+
+            for (int i = 0; i < sets.size(); i++) {
+                Set<String> s1 = new HashSet<>(sets.get(i));
+                for (int j = i + 1; j < sets.size(); j++) {
+                    Set<String> s2 = new HashSet<>(sets.get(j));
+                    s2.retainAll(s1);
+                    if (!s2.isEmpty()) {
+                        logger.info("非LL1：关于非终结符【" + v + "】的规则select集存在交集:" + s2);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 判断是否存在左递归
+     * @param grammar
+     * @return
+     */
+    public static boolean isLRecursionExist(Grammar grammar) {
+        for (Rule rule : grammar.getRules()) {
+            String L = rule.L;
+            if (t(grammar, L, rule)) return true;
+        }
+        return false;
+    }
+
+    public static boolean isCommonFactorExist(Grammar grammar) {
+        for (String v : grammar.getV()) {
+            HashMap<String, Integer> map = new HashMap<>();
+            for (Rule rule : grammar.getRulesOf(v)) {
+                String R = rule.R[0];
+                Integer i;
+                if ((i = map.putIfAbsent(R, 1)) != null) {
+                    map.put(R, i + 1);
+                }
+            }
+            return map.values().removeIf(integer -> integer > 1);
+        }
+        return false;
+    }
+
+    private static boolean t(Grammar grammar, String L, Rule rule) { // 当代入rule后是否存在左递归
+        if (L.equals(rule.R[0])) return true;
+        if (grammar.getT().contains(rule.R[0])) return false;
+
+        for (Rule r : grammar.getRulesOf(rule.R[0])) {
+            if (t(grammar, L, r)) return true;
+        }
+        return false;
+    }
 
 }

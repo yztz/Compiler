@@ -1,5 +1,7 @@
 package top.yzzblog.compiler.Lex;
 
+import top.yzzblog.compiler.Util;
+
 import java.io.*;
 
 public class Scanner {
@@ -10,14 +12,12 @@ public class Scanner {
 
     private int lastChar;
 
-    private File file;
 
-    public Scanner(String filename) {
-        file = new File(filename);
-
+    public Scanner(String filepath) {
         try {
-            br = new BufferedReader(new FileReader(file));
-        } catch (FileNotFoundException e) {
+            InputStream is = Util.getInputStream(filepath);
+            br = new BufferedReader(new InputStreamReader(is));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -64,7 +64,4 @@ public class Scanner {
         return colNum;
     }
 
-    public String getFile() {
-        return file.getAbsolutePath();
-    }
 }

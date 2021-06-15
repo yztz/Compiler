@@ -1,6 +1,17 @@
 package top.yzzblog.compiler;
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import top.yzzblog.compiler.grammar.Grammar;
+import top.yzzblog.compiler.grammar.GrammarParseException;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 public class Util {
+    private final static Logger logger = LoggerFactory.getLogger(Util.class);
 
     public static boolean isDigit(char c) {
         return c >= '0' && c <= '9';
@@ -32,5 +43,31 @@ public class Util {
             sb.append(str);
         }
         return sb.toString();
+    }
+
+    public static InputStream getInputStream(String filepath) {
+        InputStream is = null;
+        try {
+            is = Util.class.getClassLoader().getResourceAsStream(filepath);
+            if (null == is) throw new IOException();
+        } catch (IOException e) {
+            logger.error(filepath + "文件IO错误");
+            e.printStackTrace();
+        }
+
+        return is;
+    }
+
+    public static JSONObject readJSONObj(String filepath) {
+        String tmp = null;
+        try {
+            InputStream is = getInputStream(filepath);
+            tmp = IOUtils.toString(is);
+        } catch (IOException e) {
+            logger.error(filepath + "文件IO错误");
+            e.printStackTrace();
+        }
+
+        return JSONObject.parseObject(tmp);
     }
 }

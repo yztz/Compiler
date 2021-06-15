@@ -3,7 +3,6 @@ package top.yzzblog.compiler.grammar;
 import top.yzzblog.compiler.Util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,7 +24,7 @@ public class Rule {
             while (m.find()) R.add(m.group());
             this.R = R.toArray(new String[0]);
         } else {
-            this.R_str = "ε";
+            this.R_str = Grammar.EPSILON;
             this.R = new String[]{this.R_str};
         }
 //        int len = lr[1].length();
@@ -48,7 +47,7 @@ public class Rule {
     }
 
     public boolean isEpsilon() {
-        return R.length == 1 && R[0].equals("ε");
+        return R.length == 1 && R[0].equals(Grammar.EPSILON);
     }
 
 
