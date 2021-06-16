@@ -1,10 +1,14 @@
 package top.yzzblog.compiler.Lex;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import top.yzzblog.compiler.Util;
 
 import java.io.InputStream;
 
 public class Lexer implements Tokenizer {
+    private static final Logger logger = LoggerFactory.getLogger(Lexer.class);
+
     private final Scanner scanner;
     private char ch;
 
@@ -24,8 +28,6 @@ public class Lexer implements Tokenizer {
             System.out.println(token);
             token = getToken();
         }
-
-
     }
 
     private boolean scan(Character need) {
@@ -44,7 +46,7 @@ public class Lexer implements Tokenizer {
         scan(null);
     }
     private void printError(String msg) {
-        System.out.printf("Error: 词法错误 at %d:%d: %s\n",
+        logger.error("Error: 词法错误 at {}:{}:{}",
                 scanner.getLineNum(),
                 scanner.getColNum(),
                 msg);

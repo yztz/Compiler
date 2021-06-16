@@ -22,7 +22,15 @@ public class Grammar {
     private HashMap<String, Set<String>> first;
     private HashMap<String, Set<String>> follow;
 
-    private Grammar(List<String> V, List<String> T, List<String> P, String S) {
+    private String name;
+
+    private Grammar(String name, List<String> V, List<String> T, List<String> P, String S) {
+        if (null == name) {
+            this.name = "(untitled)";
+        } else {
+            this.name = name;
+        }
+
         this.V = new ArrayList<>(V);
         this.T = new ArrayList<>(T);
         this.S = S;
@@ -37,6 +45,7 @@ public class Grammar {
 
 
     private Grammar(Grammar grammar, List<Rule> rules) {
+        this.name = grammar.name;
         this.V = new ArrayList<>(grammar.V);
         this.T = new ArrayList<>(grammar.T);
 
@@ -97,9 +106,6 @@ public class Grammar {
         return true;
     }
 
-    public static Grammar extend(Grammar old, List<Rule> rules) {
-        return new Grammar(old, rules);
-    }
 
     public static Grammar extend(Grammar old) {
         return new Grammar(old, new ArrayList<>());
@@ -125,17 +131,22 @@ public class Grammar {
         JSONObject raw = Util.readJSONObj(filepath);
 
         List<String> V, T, P;
-        String S;
+        String S, name;
 
         V = raw.getJSONArray("V").toJavaList(String.class);
         T = raw.getJSONArray("T").toJavaList(String.class);
         P = raw.getJSONArray("P").toJavaList(String.class);
         S = raw.getString("S");
+        name = raw.getString("name");
 
-        Grammar grammar = new Grammar(V, T, P, S);
+        Grammar grammar = new Grammar(name, V, T, P, S);
         if(!grammar.validate()) throw new GrammarParseException("无效的文法");
 
         return grammar;
+    }
+
+    public String getName() {
+        return name;
     }
 
     private void clearCache() {
@@ -304,9 +315,12 @@ public class Grammar {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Rule rule : rules) {
-            sb.append(rule.L).append(" -> ").append(rule.R_str).append("\n");
-        }
+        sb.append("Name: ").append(getName()).append("\n");
+        sb.append("S: ").append(getS()).append('\n');
+        sb.append("V: ").append(getV()).append('\n');
+        sb.append("T: ").append(getT()).append('\n');
+        sb.append("P: ").append('\n');
+        getRules().forEach(rule -> sb.append('\t').append(rule).append('\n'));
 
         return sb.toString();
     }

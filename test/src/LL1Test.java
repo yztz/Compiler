@@ -11,7 +11,7 @@ import top.yzzblog.compiler.grammar.Rule;
 
 
 public class LL1Test {
-    private static final String DIR = "./LL1(1)/";
+    private static final String DIR = "./LL1(2)/";
     private Grammar grammar;
     private Adapter adapter;
     private Tokenizer tokenizer;
@@ -21,8 +21,6 @@ public class LL1Test {
         this.grammar = Grammar.parse(DIR + "grammar.json");
         this.grammar = GrammarUtil.rmLRecursion(grammar);
         this.grammar = GrammarUtil.extractCommonFactor(grammar);
-
-        System.out.println(grammar);
 
         this.adapter = AdapterFactory.parse(DIR + "adapter.json");
         this.tokenizer = new Lexer(DIR + "test.sy");
@@ -34,21 +32,6 @@ public class LL1Test {
         parser.parse(tokenizer, adapter);
     }
 
-
-    @Test
-    public void rmLRecursionTest() {
-        Grammar grammar = Grammar.parse("./test.json");
-        System.out.println(GrammarUtil.rmLRecursion(grammar));
-
-    }
-
-    @Test
-    public void extractCommonTest() {
-
-        Grammar grammar = Grammar.parse("./commonFactor.json");
-        System.out.println(GrammarUtil.extractCommonFactor(grammar));
-
-    }
 
     @Test
     public void tableTest() {

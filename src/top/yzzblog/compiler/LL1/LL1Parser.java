@@ -12,7 +12,7 @@ import top.yzzblog.compiler.grammar.Rule;
 
 import java.util.*;
 
-public class LL1Parser {
+public class LL1Parser implements Parser {
     private final static Logger logger = LoggerFactory.getLogger(LL1Parser.class);
 
     private HashMap<String, Integer> v2i, t2i;
@@ -34,20 +34,20 @@ public class LL1Parser {
         Token token = tokenizer.getToken();
         String X = stack.peek();
         while (!X.equals(adapter.getT(Tag.END))) {
-            logger.debug("当前栈顶【" + X + "】\t@" + stack);
+            logger.debug("栈顶【" + X + "】\t@" + stack);
             Tag tag = token.tag;
             if (X.equals(adapter.getT(tag))) {
-                logger.debug("成功匹配【" + tag + "】");
+                logger.debug("捕获【{}】", tag);
                 stack.pop();
                 token = tokenizer.getToken();
             } else if (grammar.getT().contains(X)) {
-                error("无法匹配的终结符【" + X + "】，当前字符【" + token + "】");
+                error("Expected【{}】, but found 【{}】", X, token);
             } else {
                 Rule rule = table.getCell(v2i.get(X), t2i.get(adapter.getT(tag)));
                 if (null == rule) {
-                    error("规则不存在【" + X + "】 -> " + "【" + tag + "】");
+                    error("Unexpected【{}】", token);
                 } else {
-                    logger.debug("使用规则" + rule.toString());
+                    logger.debug("应用规则 " + rule);
                     stack.pop();
                     String[] R = rule.R;
                     for (int i = R.length - 1; i >= 0; i--) {
@@ -60,8 +60,8 @@ public class LL1Parser {
         logger.info("匹配成功");
     }
 
-    private void error(String msg) {
-        logger.error(msg);
+    private void error(String msg, Object ...objs) {
+        logger.error("语法错误：" + msg, objs);
         System.exit(-1);
     }
 
@@ -110,7 +110,10 @@ public class LL1Parser {
 
     @Override
     public String toString() {
-        return table.toString();
+        return "==========================================\n" +
+                "Parser: LL1Parser\n" +
+                grammar +
+                '\n' + "select: " + '\n' + table.toString();
     }
 
 
