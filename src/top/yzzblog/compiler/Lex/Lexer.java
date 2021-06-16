@@ -2,7 +2,8 @@ package top.yzzblog.compiler.Lex;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.yzzblog.compiler.Util;
+import top.yzzblog.compiler.util.Tokenizer;
+import top.yzzblog.compiler.util.Util;
 
 import java.io.InputStream;
 

@@ -1,4 +1,4 @@
-package top.yzzblog.compiler.Lex;
+package top.yzzblog.compiler.util;
 
 import top.yzzblog.compiler.Lex.Token;
 

@@ -2,13 +2,14 @@ package top.yzzblog.compiler.LL1;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.yzzblog.compiler.Lex.Adapter;
+import top.yzzblog.compiler.util.Adapter;
 import top.yzzblog.compiler.Lex.Tag;
 import top.yzzblog.compiler.Lex.Token;
-import top.yzzblog.compiler.Lex.Tokenizer;
+import top.yzzblog.compiler.util.Tokenizer;
 import top.yzzblog.compiler.Table;
 import top.yzzblog.compiler.grammar.Grammar;
 import top.yzzblog.compiler.grammar.Rule;
+import top.yzzblog.compiler.util.Parser;
 
 import java.util.*;
 
@@ -34,18 +35,20 @@ public class LL1Parser implements Parser {
         Token token = tokenizer.getToken();
         String X = stack.peek();
         while (!X.equals(adapter.getT(Tag.END))) {
-            logger.debug("栈顶【" + X + "】\t@" + stack);
+            int row = tokenizer.getLineNo();
+            int col = tokenizer.getColNo();
+            logger.debug("栈顶[" + X + "]\t@" + stack);
             Tag tag = token.tag;
             if (X.equals(adapter.getT(tag))) {
                 logger.debug("捕获【{}】", tag);
                 stack.pop();
                 token = tokenizer.getToken();
             } else if (grammar.getT().contains(X)) {
-                error("Expected【{}】, but found 【{}】", X, token);
+                error("{}:{} 需要'{}'", row, col, X);
             } else {
                 Rule rule = table.getCell(v2i.get(X), t2i.get(adapter.getT(tag)));
                 if (null == rule) {
-                    error("Unexpected【{}】", token);
+                    error("{}:{} Unexpected '{}'", row, col, token);
                 } else {
                     logger.debug("应用规则 " + rule);
                     stack.pop();
@@ -61,7 +64,7 @@ public class LL1Parser implements Parser {
     }
 
     private void error(String msg, Object ...objs) {
-        logger.error("语法错误：" + msg, objs);
+        logger.error("语法错误 " + msg ,objs);
         System.exit(-1);
     }
 

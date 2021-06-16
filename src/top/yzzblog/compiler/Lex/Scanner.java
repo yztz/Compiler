@@ -1,6 +1,6 @@
 package top.yzzblog.compiler.Lex;
 
-import top.yzzblog.compiler.Util;
+import top.yzzblog.compiler.util.Util;
 
 import java.io.*;
 
@@ -9,6 +9,8 @@ public class Scanner {
 
     private int lineNum = 1;
     private int colNum = 0;
+
+    private int lastColNum;
 
     private int lastChar;
 
@@ -35,6 +37,7 @@ public class Scanner {
         }
         if (lastChar == '\n') {
             lineNum++;
+            lastColNum = colNum;
             colNum = 0;
         }
 
@@ -57,11 +60,11 @@ public class Scanner {
     }
 
     public int getLineNum() {
-        return lineNum;
+        return lineNum - 1;
     }
 
     public int getColNum() {
-        return colNum;
+        return lastColNum;
     }
 
 }

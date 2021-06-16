@@ -1,19 +1,21 @@
 package top.yzzblog.compiler.recursiveDescent;
 
-import com.sun.istack.internal.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import top.yzzblog.compiler.Lex.Tag;
 import top.yzzblog.compiler.Lex.Token;
-import top.yzzblog.compiler.Lex.Tokenizer;
+import top.yzzblog.compiler.util.Parser;
+import top.yzzblog.compiler.util.Tokenizer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class RdParser {
+    private static final Logger logger = LoggerFactory.getLogger(RdParser.class);
+
     private Tokenizer tokenizer;
     private Token t;
-    private boolean verbose;
-
     private Deque<String> deque = new ArrayDeque<>();
 
     public RdParser(Tokenizer tokenizer) {
@@ -24,14 +26,9 @@ public class RdParser {
     private void invoke(String name) {
         try {
             deque.push(name);
-            if (verbose) {
-                System.out.println(name + " => " + deque.toString());
-                this.getClass().getDeclaredMethod(name).invoke(this);
-                System.out.println(name + " <= " + deque.toString());
-            } else {
-                this.getClass().getDeclaredMethod(name).invoke(this);
-            }
-            deque.pop();
+            logger.debug("{}入栈，当前：{}", name, deque);
+            this.getClass().getDeclaredMethod(name).invoke(this);
+            logger.debug("{}出栈，当前：{}", deque.pop(), deque);
 
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
@@ -39,21 +36,17 @@ public class RdParser {
     }
 
 
-    public void analyze(boolean verbose) {
+    public void analyze() {
         this.deque.clear();
-        this.verbose = verbose;
 
         move();
         invoke("E");
         if (t.tag == Tag.END)
-            System.out.println("语法分析成功");
+            logger.info("语法分析成功");
         else
-            syntaxError("不支持的表达式");
+            logger.error("不支持的表达式");
     }
 
-    public void analyze() {
-        analyze(false);
-    }
 
     private void move() {
         this.t = tokenizer.getToken();
@@ -61,7 +54,7 @@ public class RdParser {
 
     private boolean match(Tag tag) {
         if (tag == t.tag) {
-            if (verbose) System.out.println(t + " matched!");
+            logger.debug("匹配成功【{}】", t);
             move();
             return true;
         } else {
@@ -82,7 +75,6 @@ public class RdParser {
 
 
     private void E_() {
-        int a = (1 + 2);
         if (t.tag == Tag.END || t.tag == Tag.RPAREN) {
             return;
         }
@@ -140,10 +132,7 @@ public class RdParser {
 
 
     private void syntaxError(String msg) {
-        System.out.printf("Syntax Error at %d:%d: %s\n",
-                tokenizer.getLineNo(),
-                tokenizer.getColNo(),
-                msg);
+        logger.error("语法错误 at {}:{} {}", tokenizer.getLineNo(), tokenizer.getColNo(), msg);
         System.exit(-1);
     }
 

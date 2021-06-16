@@ -1,6 +1,6 @@
 package top.yzzblog.compiler.grammar;
 
-import top.yzzblog.compiler.Util;
+import top.yzzblog.compiler.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;

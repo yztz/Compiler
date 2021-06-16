@@ -1,10 +1,9 @@
 package top.yzzblog.compiler.Lex;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.io.IOUtils;
-import top.yzzblog.compiler.Util;
+import top.yzzblog.compiler.util.Adapter;
+import top.yzzblog.compiler.util.Util;
 
-import java.io.*;
 import java.util.HashMap;
 
 public class AdapterFactory {

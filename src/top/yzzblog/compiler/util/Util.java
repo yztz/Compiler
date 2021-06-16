@@ -1,11 +1,10 @@
-package top.yzzblog.compiler;
+package top.yzzblog.compiler.util;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.yzzblog.compiler.grammar.Grammar;
-import top.yzzblog.compiler.grammar.GrammarParseException;
+
 
 import java.io.IOException;
 import java.io.InputStream;

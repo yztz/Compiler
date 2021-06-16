@@ -1,12 +1,10 @@
 package top.yzzblog.compiler.grammar;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.yzzblog.compiler.Util;
+import top.yzzblog.compiler.util.Util;
 
-import java.io.*;
 import java.util.*;
 
 public class Grammar {

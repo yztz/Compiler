@@ -1,13 +1,12 @@
 import org.junit.Before;
 import org.junit.Test;
-import top.yzzblog.compiler.Lex.Adapter;
+import top.yzzblog.compiler.util.Adapter;
 import top.yzzblog.compiler.Lex.AdapterFactory;
 import top.yzzblog.compiler.LL1.LL1Parser;
 import top.yzzblog.compiler.Lex.Lexer;
-import top.yzzblog.compiler.Lex.Tokenizer;
+import top.yzzblog.compiler.util.Tokenizer;
 import top.yzzblog.compiler.grammar.Grammar;
 import top.yzzblog.compiler.grammar.GrammarUtil;
-import top.yzzblog.compiler.grammar.Rule;
 
 
 public class LL1Test {
