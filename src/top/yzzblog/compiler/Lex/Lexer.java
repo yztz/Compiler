@@ -26,7 +26,7 @@ public class Lexer implements Tokenizer {
     public void parse() {
         Token token = getToken();
         while (token.tag != Tag.END) {
-            System.out.println(token);
+            logger.debug(token.toString());
             token = getToken();
         }
     }
@@ -95,7 +95,7 @@ public class Lexer implements Tokenizer {
                     ch == '_');
             String name = sb.toString();
             Tag tag = KeyWords.getTag(name);
-            // 当不为标识符
+            // 当为标识符
             if (tag == Tag.ID)
                 token = new Token.ID(name);
             else

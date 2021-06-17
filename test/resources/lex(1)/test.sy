@@ -1,13 +1,11 @@
 int a;
 int main()
 {
-
 	a = 10;
                 b = 0x;
                 c = 027;
                 // d = 20;
                /* e = 30;
-
 
 	if ( a><0 )
                {
@@ -16,7 +14,5 @@ int main()
 	else{
 		return 0;
 	}
-
 	if ( 1 | 2)
-
 }
